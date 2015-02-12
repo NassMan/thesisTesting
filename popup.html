@@ -1,0 +1,62 @@
+<!Doctype html>
+<html>
+  <head>
+    <title>now Popup</title>
+    <style type = "text/css">
+      body { 
+        min-width: 250px;
+        max-height: 250px;
+      }
+
+      #interface {
+        text-align: center;
+      }
+
+      .class {
+        float: left;
+      }
+
+      #spent-div {
+        /*position: fixed;
+        top: 30px;
+        right: 5px;*/
+        float:left;
+        width: 200px;
+        height: 200px;
+      }
+
+      #percentage-div {
+        width: 200px;
+        height: 200px;
+        position: relative;
+        left: 250px;
+        top: -250px;
+      }
+      
+    </style>
+  
+    <script type = "text/javascript"
+	    src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+      </script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type = "text/javascript" src = "./setup.js"></script>
+
+  </head>
+
+  <body>	
+    <div id = "interface">
+      <!-- has dropdown menu for target with submit -->
+      <select id = 'dropdown'>
+      </select>
+      <div id = "submit">
+        <button>Set target (Hours)</button>
+      </div>
+    </div> 
+    <div class = "graphs"> 
+      <div id="spent_div"></div>
+      <div id="percentage_div"></div>
+    </div>
+    <button id = "block">Block Now</button>
+  </body>
+</html>
+

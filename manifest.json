@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+
+  "name": "now",
+  "description": "",
+  "version": "1.0",
+
+  "permissions": ["tabs", "idle", "http://*.google.com/", "https://*.google.com/", "storage"],
+  
+  "background": {
+    "scripts": ["jquery-1.11.1.js", "background.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "Cloud_v_12.jpeg",
+    "default_popup": "popup.html"
+  },
+
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["jquery-1.11.1.js", "contentscript.js"],
+    "run_at": "document_start"
+    }],
+
+  "options_page": "options.html",
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://ajax.googleapis.com https://www.google.com; object-src 'self'"
+}

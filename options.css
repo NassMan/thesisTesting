@@ -1,0 +1,47 @@
+body {
+    margin: 15px;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 13px;
+}
+
+#header h1 {
+    display: inline;
+    font-size: 156%;
+    padding-bottom: 43px;
+    padding-left: 75px;
+    padding-top: 30px;
+    /*background: url(icon_128.png) no-repeat;
+    background-size: 50px;
+    background-position: 1px 18px;*/
+}
+
+#export {
+	float: right;
+}
+
+#doms {
+	position: fixed;
+	top: 80px;
+	left: 200px;
+}
+
+ #extras {
+ 	position: fixed;
+ 	top: 300px;
+ 	left: 185px;
+ 	padding: 10px;
+    color: #333;
+    border: 1px solid #999999;
+ }
+
+#dur {
+	float: top;
+	padding: 12px 24px 12px 12px;
+
+}
+
+#redirect {
+	float: bottom;
+	padding: 12px 24px 12px 12px;
+}
+
