@@ -4,35 +4,53 @@
     <title>now Popup</title>
     <style type = "text/css">
       body { 
-        min-width: 250px;
-        max-height: 250px;
+        width: 300px;
+        height: 375px;
       }
 
-      #interface {
-        text-align: center;
+      #setTarget {
+        position: fixed;        
+        top: 325px;
+        left: 88px;
+      }
+      #dropdown {
+        position: fixed;        
+        top: 342px;
+        left: 108px;
       }
 
-      .class {
-        float: left;
+      #submit {
+        position: fixed;        
+        top: 360px;
+        left: 133px;
       }
 
-      #spent-div {
-        /*position: fixed;
-        top: 30px;
-        right: 5px;*/
-        float:left;
+      #reminder {
+        position: fixed;
+        top: 360px;
+        left: 25px;
+      }
+
+       #settings {
+          float: left;
+          margin-top: -1px;
+          font-size: 12px;
+      }
+      #settings a {
+          font-weight: bold;
+      }
+      #settings a:hover {
+          text-decoration: underline;
+      }
+
+      #graph {
+        position: fixed;
+        top: 25px;
+        /*left: 55px;*/
+        /*float:left;
         width: 200px;
-        height: 200px;
+        height: 200px;*/
       }
-
-      #percentage-div {
-        width: 200px;
-        height: 200px;
-        position: relative;
-        left: 250px;
-        top: -250px;
-      }
-      
     </style>
   
     <script type = "text/javascript"
@@ -44,19 +62,20 @@
   </head>
 
   <body>	
-    <div id = "interface">
-      <!-- has dropdown menu for target with submit -->
-      <select id = 'dropdown'>
-      </select>
-      <div id = "submit">
-        <button>Set target (Hours)</button>
-      </div>
-    </div> 
-    <div class = "graphs"> 
-      <div id="spent_div"></div>
-      <div id="percentage_div"></div>
+    <div id="settings">
+      <a id="options" href="#">Options</a>
+      &nbsp;|&nbsp;
+      <a id="block" href="#">Block Now</a>
     </div>
-    <button id = "block">Block Now</button>
+
+    <!-- has dropdown menu for target with submit -->
+    <div id = 'target'>
+      <label id = 'setTarget'><b>Set Play Time Target</b></label>
+      <select id = 'dropdown'></select>
+      <button id = 'submit'>Set</button>
+    </div>
+    <div id = 'reminder'></div>
+    <div id = "graph"></div>
   </body>
 </html>
 

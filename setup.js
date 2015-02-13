@@ -26,9 +26,9 @@ $(document).ready(function () {
 
     // else block any target change
     else {
-      $("#interface").fadeOut("fast");
-      var $set = $("<p>target set for " + target + " hours</p>");
-      $("body").append($set);
+      $("#target").hide();
+      var $set = $("<b>Target set for " + target + " hour(s)</b>");
+      $("#reminder").append($set);
     }
 
     var showButton = JSON.parse(localStorage["blockVar"]);
@@ -36,8 +36,16 @@ $(document).ready(function () {
   }
 
   $("#block").click(initiateBlock);
+  $("#options").click(showOptions);
   google.setOnLoadCallback(makeChart);
 });
+
+// Show options in a new tab
+function showOptions() {
+  chrome.tabs.create({
+    url: 'options.html'
+  });
+}
 
 function initiateBlock() {
 
@@ -92,37 +100,46 @@ function makeChart() {
   // display total wasted time since last reset
   var spentMins = Math.floor(timeWasted / 60);
   console.log('minutes spent is ' + spentMins);
-  var data1 = new google.visualization.DataTable();
-  data1.addColumn('string', 'Time Spent'); 
-  data1.addColumn('number', 'minutes');
-  data1.addRows([['Minutes Spent', spentMins]]);
+  var data = google.visualization.arrayToDataTable([
+    ['Element', 'Play Time Usage', { role: 'style' }],
+    ['Minutes Spent', spentMins, 'color: blue']
+      ]);
+  /*var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Time Spent'); 
+  data.addColumn('number', 'minutes');
+  data.addRows([['Minutes Spent', spentMins]]);*/
 
-  var options = {
-    title: 'Time spent on play sites',
-    colors: ['green']
-    // hAxis: {title: 'Minutes spent on play sites', titleTextStyle: {color: 'blue'}}
-  };
-  drawChart(data1, options, 'spent_div');
+  var title = 'Time spent on play sites';
+
 
   //display wasted time as %age of target
   if (target !== 0) {
 
     // create % of target data table
     var percent = Math.floor(((timeWasted / 60) / (60 * target)) * 100);
-    var data2 = new google.visualization.DataTable();
-    data2.addColumn('string', 'Time Spent') 
-    data2.addColumn('number', '%'),
-    data2.addRows([['target Used (%)', percent]]);
-
-    options = {
-      title: 'target usage'
-      //hAxis: {title: '% of target used', titleTextStyle: {color: 'green'}}
-    };
-    drawChart(data2, options, 'percentage_div');
+    //var data2 = new google.visualization.DataTable();
+    data = google.visualization.arrayToDataTable([
+          ['Year', 'Minutes Spent', '% of Target'],
+          ['Play Time Usage',  spentMins, percent]
+        ]);
+    /*data.addColumn('string', 'Time Spent') 
+    data.addColumn('number', '%'),
+    data.addRows([['target Used (%)', percent]]);*/
+    title = 'Time Spent and Target Usage';
   }
+
+  options = {
+    width: 300,
+    height: 300,
+    title: title
+    };
+
+  var timeChart = new google.visualization.ColumnChart(
+    document.getElementById('graph'));
+
+  timeChart.draw(data, options);
+  console.log("yeah man");
 }
-
-
 
 // set target variable and alter interface so target cannot be reset
 function setTarget() {
@@ -157,18 +174,11 @@ function setTarget() {
     localStorage["target"] = JSON.stringify(target);
 
 		console.log("hiding");
-    $("#interface").hide();
-    var $set = $("<p>target set for " + target + " hours</p>");
-    $("body").append($set);
+    $("#target").hide();
+    var $set = $("<b>Target set for " + target + " hour(s)</b>");
+    $("#reminder").append($set);
 	}
 }
 
-function drawChart(data, options, div) {
-  console.log('chart creation code called on ' + div);
-    var chart = new google.visualization.ColumnChart(
-    	document.getElementById(div));
-
-    chart.draw(data, options);
-}
 
 
