@@ -35,7 +35,10 @@ $(document).ready(function () {
     if (showButton) $("#block").hide();
   }
 
-  $("#block").click(initiateBlock);
+  $("#block").click(function(){
+    chrome.extension.sendRequest({ msg: "initiateBlock" });
+  });
+
   $("#options").click(showOptions);
   google.setOnLoadCallback(makeChart);
 });
@@ -45,50 +48,6 @@ function showOptions() {
   chrome.tabs.create({
     url: 'options.html'
   });
-}
-
-function initiateBlock() {
-
-  // ask the user to block sites
-  var dur = localStorage["blockDuration"];
-  var c = 
-    confirm("Are you sure you want to block now for " + dur + " hour(s)?");
-  
-  // increment prompt total     
-  var promptNum = JSON.parse(localStorage["promptNum"]);
-  if (promptNum !== undefined) promptNum++;
-  else promptNum = 1;
-
-  localStorage["promptNum"] = JSON.stringify(promptNum);
-  console.log('number of block prompts is ' + promptNum);
-
-  if (c === true) {
-    $("#block").hide();
-
-    // set block and increment block total
-    localStorage["timeWasted"] = 0;
-    localStorage["checkPtNum"] = 0;
-    localStorage["blockVar"] = "true";
-    var blockNum = JSON.parse(localStorage["blockNum"]);
-    if (blockNum !== undefined) blockNum++;
-    else blockNum = 1;
-        
-    localStorage["blockNum"] = JSON.stringify(blockNum);
-    console.log('number of blocks is ' + blockNum);
-
-    // log target size in target cache
-    var bCache = localStorage["blockLog"];
-    bCache += "\n" + blockNum + ". User Instigated; " + dur + " hours";
-    console.log(bCache);
-    localStorage["blockLog"] = bCache;
-  
-    //var 5minMS = 600 * 1000; // sec * ms/sec    
-    //setTimeout( function() {
-
-        // refresh the current window
-      chrome.tabs.reload(); 
-      //}, 5minMS);                   
-  }
 }
 
 function makeChart() {

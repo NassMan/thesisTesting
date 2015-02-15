@@ -218,7 +218,9 @@ function checkWasteTarget(wastedTime, target) {
 		console.log(wastedTime + " is the current wasted time total");
 
 		// prevents breaking if block set later than current checkpoint
-		if (wastedTime > targetCheckPt) localStorage["checkPtNum"] = i + 1;
+		if (wastedTime > targetCheckPt) {
+			localStorage["checkPtNum"] = i + 1;
+		}
 
 		if (wastedTime === targetCheckPt) {
 			console.log("time match!");
@@ -285,6 +287,7 @@ function blockPrompt(ratio) {
   		//}, 5minMS);										
 		
 	}
+
 	else {
 		if (ratio === 2) {
 			localStorage["timeWasted"] = 0;
@@ -292,6 +295,60 @@ function blockPrompt(ratio) {
 			localStorage["target"] = 0;
 			alert("resetting target to 0");
 		}
+	}
+}
+
+// listen for popup to initiate the block
+chrome.extension.onRequest.addListener(
+    function(request, sender, sendResponse){
+        if(request.msg == "initiateBlock") initiateBlock();
+    }
+);
+
+// prompt for user initiated block from the popup
+function initiateBlock() {
+
+
+	if 
+
+  	// ask the user to block sites
+  	var dur = localStorage["blockDuration"];
+  	var c = 
+    	confirm("Are you sure you want to block now for " + dur + " hour(s)?");
+
+  	// increment prompt total     
+  	var promptNum = JSON.parse(localStorage["promptNum"]);
+  	if (promptNum !== undefined) promptNum++;
+  	else promptNum = 1;
+  	localStorage["promptNum"] = JSON.stringify(promptNum);
+  	console.log('number of block prompts is ' + promptNum);
+
+	if (c === true) {
+
+		// set block and increment block total
+		localStorage["timeWasted"] = 0;
+		localStorage["checkPtNum"] = 0;
+		localStorage["blockVar"] = "true";
+		var blockNum = JSON.parse(localStorage["blockNum"]);
+		if (blockNum !== undefined) blockNum++;
+		else blockNum = 1;
+				
+		localStorage["blockNum"] = JSON.stringify(blockNum);
+		console.log('number of blocks is ' + blockNum);
+
+		// log target size in target cache
+    	var bCache = localStorage["blockLog"];
+    	bCache += "\n" + blockNum + ". User Instigated. " + dur + " hours";
+    	console.log(bCache);
+    	localStorage["blockLog"] = bCache;
+	
+		//var 5minMS = 600 * 1000; // sec * ms/sec		
+		//setTimeout( function() {
+
+    		// refresh the current window
+			chrome.tabs.reload();	
+  		//}, 5minMS);										
+		
 	}
 }
 
