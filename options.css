@@ -14,8 +14,15 @@ body {
     background-size: 50px;
     background-position: 1px 18px;*/
 }
-
 #export {
+	float: right;
+}
+#key {
+	position: fixed;
+	top: 10px;
+	left: 400px;
+}
+#keyButton {
 	float: right;
 }
 
@@ -25,21 +32,19 @@ body {
 	left: 200px;
 }
 
- #extras {
+#extras {
  	position: fixed;
  	top: 300px;
  	left: 185px;
  	padding: 10px;
     color: #333;
     border: 1px solid #999999;
- }
-
+}
 #dur {
 	float: top;
 	padding: 12px 24px 12px 12px;
 
 }
-
 #redirect {
 	float: bottom;
 	padding: 12px 24px 12px 12px;

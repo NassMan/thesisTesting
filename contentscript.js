@@ -1,5 +1,6 @@
+
+
 // request local storage data package from background.js
-//chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
 
   console.log("receiving background data for block");
@@ -9,7 +10,7 @@ chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
   var dH = JSON.parse(response.dH);
   var workpage = response.workpage;
 
-  if (block === true) {
+  if (block) {
     console.log("we gotta block, man");
 
     // process domain name from current URL

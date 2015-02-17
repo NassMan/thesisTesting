@@ -1,4 +1,5 @@
-UPDATE_SECONDS = 5;
+var UPDATE_SECONDS = 5;
+var waiting = false;
 
 // create domains hash table
 var domHash = new Object();
@@ -49,6 +50,16 @@ localStorage["blockLog"] = "";
 // option to change how long you're blocked
 localStorage["blockDuration"] = 1;
 
+// key to determine features
+// now -> now
+// 5 minutes -> 5min
+// no target -> count
+// control -> control
+localStorage["keyVal"] = "now";
+
+// disables multiple key inputs
+localStorage["keyBool"] = "false";
+
 // send needed data to content script if requested
 chrome.runtime.onMessage.addListener( 
   	function(request, sender, sendResponse) {
@@ -67,6 +78,7 @@ function getDomain(url) {
 // returns updated hash 
 // *** thanks to Dan Kang's web timer.
 function countUpdate() {
+
 	console.log('\nnew call');
 	chrome.idle.queryState(30, function (state) {
     	chrome.windows.getCurrent(function (current) {
@@ -185,10 +197,11 @@ function countSum() {
 			console.log('Total time wasted is ' + sum + ' seconds');
 
 			var target = JSON.parse(localStorage["target"]);
-			if (target !== 0) {
+			if (target !== 0 && !waiting) {
 				checkWasteTarget(sum, target);
 			}	
 			else console.log("no target set");
+			if (waiting) console.log("waiting patiently");
 		}
 		else console.log("PANIC: timeWasted undefined!!");
 }
@@ -204,7 +217,7 @@ function checkWasteTarget(wastedTime, target) {
 	wastedTime = Math.floor(wastedTime / 60);
 	target = (target * 60);
 	console.log("target is now " + target + " minutes");
-	console.log("time wasted is " + wastedTime);
+	console.log("time wasted is " + wastedTime + " minutes");
 
 	var checked = JSON.parse(localStorage["checked"]);
 	var i = JSON.parse(localStorage["checkPtNum"]);
@@ -243,15 +256,24 @@ function checkWasteTarget(wastedTime, target) {
 // Otherwise, reset target if final checkpoint is surpassed
 function blockPrompt(ratio) {
 
+	var key = localStorage["keyVal"];
 	var percent = ratio * 100;
 	var dur = localStorage["blockDuration"];
 	
 	// ask the user to block sites
-	var c = 
-		confirm("You have spent " + percent + 
-			"% of your play time target.\n Do you want to block play sites now?\nBlock Duration set to "
-			+ dur + " hour(s)");
-	
+	if (key === "now") {
+		var c = 
+			confirm("You have spent " + percent + 
+				"% of your play time target.\n Do you want to block play sites now?\nBlock Duration set to "
+				+ dur + " hour(s)");
+	}
+	else if (key === "5min") {
+		var c = 
+			confirm("You have spent " + percent + 
+				"% of your play time target.\n Do you want to block play sites in 5 minutes?\nBlock Duration set to "
+				+ dur + " hour(s)");
+	}
+
 	// increment prompt total			
 	var promptNum = JSON.parse(localStorage["promptNum"]);
 	if (promptNum !== undefined) promptNum++;
@@ -261,31 +283,19 @@ function blockPrompt(ratio) {
 	console.log('number of block prompts is ' + promptNum);
 
 	if (c === true) {
-
-		// set block and increment block total
-		localStorage["timeWasted"] = 0;
-		localStorage["checkPtNum"] = 0;
-		localStorage["blockVar"] = "true";
-		var blockNum = JSON.parse(localStorage["blockNum"]);
-		if (blockNum !== undefined) blockNum++;
-		else blockNum = 1;
-				
-		localStorage["blockNum"] = JSON.stringify(blockNum);
-		console.log('number of blocks is ' + blockNum);
-
-		// log target size in target cache
-    	var bCache = localStorage["blockLog"];
-    	bCache += "\n" + blockNum + ". " + percent + "% of " + dur + " hours";
-    	console.log(bCache);
-    	localStorage["blockLog"] = bCache;
+		var blockNum = localStorage["blockNum"];
+    	var log = "\n" + blockNum + ". " + percent + "% of " + dur + " hours";
 	
-		//var 5minMS = 600 * 1000; // sec * ms/sec		
-		//setTimeout( function() {
-
-    		// refresh the current window
-			chrome.tabs.reload();	
-  		//}, 5minMS);										
-		
+		// block either in 5 minutes or right now, depending on key
+		if (key === "5min") {
+			waiting = true;
+			var fiveMinMS = 600 * 1000; // sec * ms/sec		
+			setTimeout(createBlock, fiveMinMS, log);			
+									
+		}
+		else if (key === "now") {
+			createBlock(log);
+		}										
 	}
 
 	else {
@@ -301,20 +311,26 @@ function blockPrompt(ratio) {
 // listen for popup to initiate the block
 chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse){
-        if(request.msg == "initiateBlock") initiateBlock();
+        if(request.msg == "initiateBlock") userBlock();
     }
 );
 
 // prompt for user initiated block from the popup
-function initiateBlock() {
-
-
-	if 
+function userBlock() {
+	var key = localStorage["keyVal"];
+	console.log("Key is currently " + key);
 
   	// ask the user to block sites
   	var dur = localStorage["blockDuration"];
-  	var c = 
-    	confirm("Are you sure you want to block now for " + dur + " hour(s)?");
+
+  	if (key === "now") {
+  		var c = 
+    		confirm("Are you sure you want to block now for " + dur + " hour(s)?");
+    }
+    else if (key === "5min") {
+    	var c =
+    		confirm("Are you sure you want to block in 5 minutes for " + dur + " hour(s)?");
+    }
 
   	// increment prompt total     
   	var promptNum = JSON.parse(localStorage["promptNum"]);
@@ -324,32 +340,47 @@ function initiateBlock() {
   	console.log('number of block prompts is ' + promptNum);
 
 	if (c === true) {
+		var blockNum = localStorage["blockNum"];
+		var log = "\n" + blockNum + ". User Instigated. " + dur + " hours";
 
-		// set block and increment block total
-		localStorage["timeWasted"] = 0;
-		localStorage["checkPtNum"] = 0;
-		localStorage["blockVar"] = "true";
-		var blockNum = JSON.parse(localStorage["blockNum"]);
-		if (blockNum !== undefined) blockNum++;
-		else blockNum = 1;
-				
-		localStorage["blockNum"] = JSON.stringify(blockNum);
-		console.log('number of blocks is ' + blockNum);
-
-		// log target size in target cache
-    	var bCache = localStorage["blockLog"];
-    	bCache += "\n" + blockNum + ". User Instigated. " + dur + " hours";
-    	console.log(bCache);
-    	localStorage["blockLog"] = bCache;
-	
-		//var 5minMS = 600 * 1000; // sec * ms/sec		
-		//setTimeout( function() {
-
-    		// refresh the current window
-			chrome.tabs.reload();	
-  		//}, 5minMS);										
-		
+		// block either in 5 minutes or right now
+		if (key === "5min") {
+			console.log("5min block just executed");
+			waiting = true;
+			var fiveMinMS = 600 * 1000; // sec * ms/sec		
+			setTimeout(createBlock, fiveMinMS, log);			
+		}
+		else if (key === "now") {
+			console.log("now block just executed");
+			createBlock(log);
+		}
 	}
+}
+
+// 
+function createBlock(bLog) {
+	console.log("block has been instigated");
+
+	// set block and increment block total
+	localStorage["timeWasted"] = 0;
+	localStorage["checkPtNum"] = 0;
+	var blockNum = JSON.parse(localStorage["blockNum"]);
+	if (blockNum !== undefined) blockNum++;
+	else blockNum = 1;
+			
+	localStorage["blockNum"] = JSON.stringify(blockNum);
+	console.log('number of blocks is ' + blockNum);
+
+	// log target size in target cache
+   	var bCache = localStorage["blockLog"];
+   	bCache += bLog;
+   	console.log(bCache);
+   	localStorage["blockLog"] = bCache;
+
+   	// instigate block
+  	waiting = false;
+	localStorage["blockVar"] = "true";
+	chrome.tabs.reload();
 }
 
 // count periodically

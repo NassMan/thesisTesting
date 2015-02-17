@@ -9,10 +9,17 @@
 	<script type = "text/javascript" src = "options.js"></script>
 </head>
 <body>
-<div id = "header">
-    <h1>Options</h1>
-    <button id = "export">Export Data</button>
-</div>
+    <div id = "header">
+        <h1>Options</h1>
+        <button id = "export">Export Data</button>
+
+        <!--one-time key input-->
+        <div id = "key">
+            <label><b>Key:</b></label>
+            <input id = "keyInput"></input><br>
+            <button id = "keyButton">Save and Close</button>
+        </div> 
+    </div>
 
     <!--Domain names text box-->
     <div id = "doms">
@@ -20,29 +27,22 @@
         <textarea rows = "10" cols = "60" id = "domains">netflix.com, buzzfeed.com, facebook.com, hulu.com, twitter.com, tumblr.com
         </textarea><br/>
         <button id = "saveDoms">Save</button>
-        <!--<label>This may take a few seconds</label>-->
     </div>
 
     <!--set block duration-->
     <div id = "extras">
-    <div id = "dur">
-        <label><b>Block Duration in hours</b></label><br>
-        <!--<select id = 'dropdown'></select>-->
-        <input id = "dropdown"></input>
-        <button id = "durButton">Set</button>
-    </div>
+        <div id = "dur">
+            <label><b>Block Duration in hours</b></label><br>
+            <input id = "dropdown"></input>
+            <button id = "durButton">Set</button>
+        </div>
 
-    <!--set redirect URL-->
-    <div id = "redirect">
-        <label><b>Redirect URL:</b></label>
-        <input id = "workpage" size = "60"></input><br>
-        <button id = "URLbutton">Save</button>
-        <!--<label>this may take a few seconds</label>-->
-    </div>
-</div>
-    
-    <!--Button for Data Export-->
-    <!--<div id = "export">
-    </div> -->
+        <!--set redirect URL-->
+        <div id = "redirect">
+            <label><b>Redirect URL:</b></label>
+            <input id = "workpage" size = "60"></input><br>
+            <button id = "URLbutton">Save</button>
+        </div>
+    </div>   
 </body>
 </html>

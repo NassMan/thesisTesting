@@ -1,5 +1,9 @@
 $(document).ready(function() {
 
+	// hide key input if it's been activated
+	var keyUsed = JSON.parse(localStorage["keyBool"]);
+	if (keyUsed) $("#key").remove();
+
 	// populate textarea with current monitored sites
 	var txt = localStorage["domHash"];
 	txt = txt.replace(/[0-9]/g, "");
@@ -13,8 +17,33 @@ $(document).ready(function() {
 	$('#export').click(exportData);
 	$('#durButton').click(saveDuration);
 	$('#URLbutton').click(verifyWorkpage);
+	$('#keyButton').click(activateKey)
 
 });
+
+// validate and activate key
+function activateKey() {
+
+	// check that it's one of the four valid keys
+	var keySub = $("#keyInput").val();
+	if (keySub !== "now" && keySub !== "5min" && 
+		keySub !== "count" && keySub !== "control") {
+
+		alert("invalid key!");
+		$('#keyInput').val();
+		return;
+	}
+
+	// save the key
+	localStorage["keyVal"] = keySub;
+	//alert("key value has taken on " + keySub);
+
+	// remove key input capability
+	localStorage["keyBool"] = "true";
+
+	// close the options page
+	window.close();
+}
 
 // thanks to Dan Kang and his web timer
 function getDomain(url) {
