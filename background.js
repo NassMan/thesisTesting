@@ -86,6 +86,14 @@ function getDomain(url) {
 function countUpdate() {
 
 	console.log('\nnew call');
+
+  	// if we should block, count blocked time
+	var blocked = JSON.parse(localStorage["blockVar"]);
+	if (blocked) {
+		checkBlock();
+		return;
+	}
+
 	chrome.idle.queryState(30, function (state) {
     	chrome.windows.getCurrent(function (current) {
 
@@ -94,50 +102,42 @@ function countUpdate() {
   				chrome.tabs.query({active: true, currentWindow: true}, 
   					function (tabs) {
 
-  					// if we should block, count blocked time
-					var blocked = JSON.parse(localStorage["blockVar"]);
-					if (blocked) {
-						checkBlock();
-					}
 
 					// if we shouldn't block, count wasted time
-					else {
-						if (tabs.length === 0) return;
+					if (tabs.length === 0) return;
 
-						var tab = tabs[0];
-						// get current Domain
-						var current = getDomain(tab.url);	
+					var tab = tabs[0];
+					// get current Domain
+					var current = getDomain(tab.url);	
 
-						// a problem cause undefined
-						console.log(localStorage["domHash"]);
-   						var dH = JSON.parse(localStorage["domHash"]);
-        				if (dH !== undefined) {
-							console.log('domHash got');
-							console.log('current domain is ' + current);
-							
-							// get the hashed domain
-							var found = 'false';
-							for (var k in dH) {
-    							if (k === current) {
-    								console.log('match found!');
-    								dH[k] += UPDATE_SECONDS;
-  									console.log(dH);
-									found = 'true';
-									break;
-    							}
-							}
-							if (found === 'true') {
-								console.log(' updating...');
-								localStorage["domHash"] = JSON.stringify(dH);
-								console.log("domHash updated!");
-								countSum();
-								
-							}
-							else console.log('no change needed');
+					// a problem cause undefined
+					console.log(localStorage["domHash"]);
+   					var dH = JSON.parse(localStorage["domHash"]);
+        			if (dH !== undefined) {
+						console.log('domHash got');
+						console.log('current domain is ' + current);
+						
+						// get the hashed domain
+						var found = 'false';
+						for (var k in dH) {
+    						if (k === current) {
+    							console.log('match found!');
+    							dH[k] += UPDATE_SECONDS;
+  								console.log(dH);
+								found = 'true';
+								break;
+    						}
 						}
-						else console.log('PANIC: Hash table does not exist!');
-							
-					}			
+						if (found === 'true') {
+							console.log(' updating...');
+							localStorage["domHash"] = JSON.stringify(dH);
+							console.log("domHash updated!");
+							countSum();								
+						}
+						else console.log('no change needed');
+					}
+					else console.log('PANIC: Hash table does not exist!');
+									
 				});
 			}
 			else console.log('state inactive; no update needed.');

@@ -37,7 +37,11 @@ var key = localStorage["keyVal"];
       }
 
       var blocking = JSON.parse(localStorage["blockVar"]);
-      if (blocking || key === "count" || key === "control") $("#block").hide();
+      if (blocking || key === "count" || key === "control") {
+        $("#block").hide();
+        $("#target").hide();
+
+      }
     }
 
    $("#block").click(function(){
@@ -65,52 +69,80 @@ function showOptions() {
 
 function makeChart() {
 
-  var timeWasted = JSON.parse(localStorage["timeWasted"]);
-  var target = JSON.parse(localStorage["target"]);
+  var blocking = JSON.parse(localStorage["blockVar"]);
+  if (blocking) {
+    
+    var dur = JSON.parse(localStorage["blockDuration"]);
+    var blockSec = JSON.parse(localStorage["blockCount"]);
+    var blockMins = Math.floor(blockSec / 60);
+    var blockPct = Math.floor(((blockMins) / (dur * 60)) * 100);
 
-
-  // display total wasted time since last reset
-  var spentMins = Math.floor(timeWasted / 60);
-  console.log('minutes spent is ' + spentMins);
-  var data = google.visualization.arrayToDataTable([
-    ['Element', 'Play Time Usage', { role: 'style' }],
-    ['Minutes Spent', spentMins, 'color: blue']
-      ]);
-  /*var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Time Spent'); 
-  data.addColumn('number', 'minutes');
-  data.addRows([['Minutes Spent', spentMins]]);*/
-
-  var title = 'Time spent on play sites';
-
-
-  //display wasted time as %age of target
-  if (target !== 0) {
-
-    // create % of target data table
-    var percent = Math.floor(((timeWasted / 60) / (60 * target)) * 100);
-    //var data2 = new google.visualization.DataTable();
     data = google.visualization.arrayToDataTable([
-          ['Year', 'Minutes Spent', '% of Target'],
-          ['Play Time Usage',  spentMins, percent]
-        ]);
-    /*data.addColumn('string', 'Time Spent') 
-    data.addColumn('number', '%'),
-    data.addRows([['target Used (%)', percent]]);*/
-    title = 'Time Spent and Target Usage';
-  }
+          ['Year', 'Minutes Blocked', '% of Block Duration'],
+          ['Block Usage',  blockMins, blockPct]
+    ]);
+    var title = 'Time Left for Block';
 
-  options = {
-    width: 300,
-    height: 300,
-    title: title
+    options = {
+      width: 300,
+      height: 300,
+      title: title
     };
 
-  var timeChart = new google.visualization.ColumnChart(
-    document.getElementById('graph'));
+    var timeChart = new google.visualization.ColumnChart(
+      document.getElementById('graph'));
 
-  timeChart.draw(data, options);
-  console.log("yeah man");
+    timeChart.draw(data, options);    
+  }
+
+  else {
+
+    var timeWasted = JSON.parse(localStorage["timeWasted"]);
+    var target = JSON.parse(localStorage["target"]);
+
+
+    // display total wasted time since last reset
+    var spentMins = Math.floor(timeWasted / 60);
+    console.log('minutes spent is ' + spentMins);
+    var data = google.visualization.arrayToDataTable([
+      ['Element', 'Play Time Usage', { role: 'style' }],
+      ['Minutes Spent', spentMins, 'color: blue']
+    ]);
+    /*var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Time Spent'); 
+    data.addColumn('number', 'minutes');
+    data.addRows([['Minutes Spent', spentMins]]);*/
+
+    var title = 'Time spent on play sites';
+
+
+    //display wasted time as %age of target
+    if (target !== 0) {
+
+      // create % of target data table
+      var percent = Math.floor(((timeWasted / 60) / (60 * target)) * 100);
+      //var data2 = new google.visualization.DataTable();
+      data = google.visualization.arrayToDataTable([
+            ['Year', 'Minutes Spent', '% of Target'],
+            ['Play Time Usage',  spentMins, percent]
+      ]);
+      /*data.addColumn('string', 'Time Spent') 
+      data.addColumn('number', '%'),
+      data.addRows([['target Used (%)', percent]]);*/
+      title = 'Time Spent and Target Usage';
+    }
+
+    options = {
+      width: 300,
+      height: 300,
+      title: title
+    };
+
+    var timeChart = new google.visualization.ColumnChart(
+      document.getElementById('graph'));
+
+    timeChart.draw(data, options);
+  }
 }
 
 // set target variable and alter interface so target cannot be reset
