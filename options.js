@@ -15,11 +15,47 @@ $(document).ready(function() {
    	// activate buttons
 	$('#saveDoms').click(checkDomInputs);
 	$('#export').click(exportData);
-	$('#durButton').click(saveDuration);
-	$('#URLbutton').click(verifyWorkpage);
-	$('#keyButton').click(activateKey)
+	$('#keyButton').click(activateKey);
+	$('#clearButton').click(clearTarget);
+
+	// change options page based on experimental group
+	var key = localStorage["keyVal"];
+	if (key === "control" || key === "count") {
+		$("#extras").hide();
+		$clear = $('<label><b>Reset Time Wasted</b><br></label>')
+		$('#clearButton').before($clear);
+	}
+
+	else {
+		$('#durButton').click(saveDuration);
+		$('#URLbutton').click(verifyWorkpage);
+		$clear = $('<label><b>Reset Target and Time Wasted</b><br></label>')
+		$('#clearButton').before($clear);
+	}
 
 });
+
+// resets target and time wasted
+function clearTarget() {
+	var c = confirm("are you sure you want to reset?");
+
+	if (c) {
+		localStorage["target"] = 0;
+		localStorage["timeWasted"] = 0;
+
+		// package and save time target was cleared
+    	var date = new Date();
+    	var day = date.getDay();
+    	var hr = date.getHours();
+    	var dateString = day + "_" + hr;
+
+    	// make a target clear log with timestamp
+		var tCache = localStorage["resetLog"];
+		var clrNum = localStorage["resetNum"];
+		tCache += clrNum + ". " + dateString;
+		localStorage["resetLog"] = tCache;
+	}
+}
 
 // validate and activate key
 function activateKey() {
@@ -236,14 +272,22 @@ function checkDom(doms, count, last) {
 function exportData() {
 	console.log("we're doing the export here");
 
-	var data = "target Cache:\n";
-	data += localStorage["targetCache"] + "\n";
+	var data = "group: " + localStorage["keyVal"] + "\n";
+	
+	data += "\n# targets Set: ";
+	data += localStorage["targetNum"] + "\n";
+	
+	data += "target set Cache:\n";
+	data += localStorage["targetLog"] + "\n";
+
+	data += "\n# targets removed: ";
+	data += localStorage["resetNum"] + "\n";
+	
+	data += "target set Cache:\n";
+	data += localStorage["resetLog"] + "\n";
 
 	data += "\ndomHash:\n";
 	data += localStorage["domHash"] + "\n";
-
-	data += "\n# targets Set: ";
-	data += localStorage["targetNum"] + "\n";
 	
 	data += "\n# Blocks Prompted: ";
 	data += localStorage["promptNum"] + "\n";

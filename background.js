@@ -26,18 +26,21 @@ localStorage["timeWasted"] = 0;
 
 localStorage["target"] = 0;
 
-localStorage["targetCache"] = "";
 
 localStorage["targetNum"] = 0;
 
 localStorage["blockVar"] = "false";
 
 localStorage["promptNum"] = 0;
+localStorage["resetNum"] = 0;
 
+// number of times blocked
 localStorage["blockNum"] = 0;
 
+// block time elapsed
 localStorage["blockCount"] = 0;
 
+// regulates checking with block ratios
 localStorage["checked"] = "false";
 localStorage["checkPtNum"] = 0;
 
@@ -45,7 +48,10 @@ localStorage["checkPtNum"] = 0;
 localStorage["redirect"] = "http://www.princeton.edu/economics";
 
 // need to create these two
-localStorage["blockLog"] = "";
+localStorage["targetLog"] = "";	// stores target setting behavior
+localStorage["blockLog"] = "";	// stores block behavior
+localStorage["resetLog"] = "";	// stores target reset behavior
+//
 
 // option to change how long you're blocked
 localStorage["blockDuration"] = 1;
@@ -55,7 +61,7 @@ localStorage["blockDuration"] = 1;
 // 5 minutes -> 5min
 // no target -> count
 // control -> control
-localStorage["keyVal"] = "now";
+localStorage["keyVal"] = "control";
 
 // disables multiple key inputs
 localStorage["keyBool"] = "false";
@@ -197,7 +203,8 @@ function countSum() {
 			console.log('Total time wasted is ' + sum + ' seconds');
 
 			var target = JSON.parse(localStorage["target"]);
-			if (target !== 0 && !waiting) {
+			var key = localStorage["keyVal"];
+			if (target !== 0 && !waiting && key !== "count" && key !== "control") {
 				checkWasteTarget(sum, target);
 			}	
 			else console.log("no target set");
@@ -284,7 +291,9 @@ function blockPrompt(ratio) {
 
 	if (c === true) {
 		var blockNum = localStorage["blockNum"];
-    	var log = "\n" + blockNum + ". " + percent + "% of " + dur + " hours";
+		var time = makeTimeStamp();
+    	var log = "\n" + blockNum + ". " + percent + 
+    		"% of " + dur + " hours. day_time: " + time;
 	
 		// block either in 5 minutes or right now, depending on key
 		if (key === "5min") {
@@ -341,7 +350,9 @@ function userBlock() {
 
 	if (c === true) {
 		var blockNum = localStorage["blockNum"];
-		var log = "\n" + blockNum + ". User Instigated. " + dur + " hours";
+		var time = makeTimeStamp();
+		var log = "\n" + blockNum + ". User Instigated. " + 
+			dur + " hours. day_time: " + time;
 
 		// block either in 5 minutes or right now
 		if (key === "5min") {
@@ -381,6 +392,15 @@ function createBlock(bLog) {
   	waiting = false;
 	localStorage["blockVar"] = "true";
 	chrome.tabs.reload();
+}
+
+function makeTimeStamp() {
+	// package and save time target was set
+    var date = new Date();
+    var day = date.getDay();
+    var hr = date.getHours();
+    var dateString = day + "_" + hr;
+    return dateString;
 }
 
 // count periodically

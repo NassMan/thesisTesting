@@ -3,44 +3,57 @@ google.load("visualization", "1.0", {packages:["corechart"]});
 // create jquery page
 $(document).ready(function () {
 
-  var timeWasted = JSON.parse(localStorage["timeWasted"]);
-  if (timeWasted !== undefined) 
-    var wasteMins = Math.floor(timeWasted / 60);
+var key = localStorage["keyVal"];
+  if (key !== "control") {
+
+    var timeWasted = JSON.parse(localStorage["timeWasted"]);
+    if (timeWasted !== undefined) 
+      var wasteMins = Math.floor(timeWasted / 60);
     
-  var target = JSON.parse(localStorage["target"]);
-  if (target !== undefined) {
+    var target = JSON.parse(localStorage["target"]);
+    if (target !== undefined) {
 
-    // offer target setting if no target set
-    if (target === 0) {
+      // offer target setting if no target set
+      if (target === 0 && key !== "count") {
 
-      // inject dropdown values
-      var option = '<option value = .1>6 minutes</option>';
-      for (var i = 1; i <= 16; i++) {
-        var val = i * 0.5;
-        option += '<option value = ' + val + '>' + val + '</option>';
+        // inject dropdown values
+        var option = '<option value = .1>6 minutes</option>';
+        for (var i = 1; i <= 16; i++) {
+          var val = i * 0.5;
+          option += '<option value = ' + val + '>' + val + '</option>';
+        }
+
+        $('#dropdown').html(option);
+        $('#submit').click(setTarget);
       }
 
-      $('#dropdown').html(option);
-      $('#submit').click(setTarget);
+      // else block any target change
+      else {
+        $("#target").hide();
+        if (key !== "count") {
+          var $set = $("<b>Target set for " + target + " hour(s)</b>");
+          $("#reminder").append($set);
+        }
+      }
+
+      var blocking = JSON.parse(localStorage["blockVar"]);
+      if (blocking || key === "count" || key === "control") $("#block").hide();
     }
 
-    // else block any target change
-    else {
-      $("#target").hide();
-      var $set = $("<b>Target set for " + target + " hour(s)</b>");
-      $("#reminder").append($set);
-    }
-
-    var showButton = JSON.parse(localStorage["blockVar"]);
-    if (showButton) $("#block").hide();
+   $("#block").click(function(){
+      chrome.extension.sendRequest({ msg: "initiateBlock" });
+    });
+    google.setOnLoadCallback(makeChart);
   }
 
-  $("#block").click(function(){
-    chrome.extension.sendRequest({ msg: "initiateBlock" });
-  });
+  // hide most features for control groups
+  else {
+    $("#target").hide();
+    $("#block").hide();
+    // $("#graph").hide();     maybe superfluous
+  }
 
   $("#options").click(showOptions);
-  google.setOnLoadCallback(makeChart);
 });
 
 // Show options in a new tab
@@ -113,20 +126,22 @@ function setTarget() {
     if (targetNum !== undefined) targetNum++;
     else targetNum = 1;
     localStorage["targetNum"] = JSON.stringify(targetNum);
-
-    // log target size in target cache
-    var qCache = localStorage["targetCache"];
-    qCache += "\n" + targetNum + ". " + target + " hrs";
-    console.log(qCache);
-    localStorage["targetCache"] = qCache;
     
-    console.log('total number of targets set is ' + targetNum);
-        
     // package and save time target was set
     var date = new Date();
     var day = date.getDay();
     var hr = date.getHours();
     var dateString = day + "_" + hr;
+    
+    // log target size in target cache
+    var qCache = localStorage["targetLog"];
+    qCache += "\n" + targetNum + ". " + target + " hrs. day_time: " + dateString;
+    console.log(qCache);
+    localStorage["targetLog"] = qCache;
+    
+    console.log('total number of targets set is ' + targetNum);
+        
+
 
     localStorage["targetSetTime"] = dateString;
     console.log('target set at day_hour ' + dateString);

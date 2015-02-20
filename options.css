@@ -26,6 +26,15 @@ body {
 	float: right;
 }
 
+#clear {
+    position: fixed;
+    top: 160px;
+    left: 730px;
+    padding-left: 5em;
+}
+#clearButton {
+}
+
 #doms {
 	position: fixed;
 	top: 80px;
