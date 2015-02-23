@@ -12,6 +12,13 @@ $(document).ready(function() {
 	txt = txt.replace(/":,"/g, ', ');
 	$("#domains").val(txt);
 
+	// populate extras with their values
+	txt = localStorage["blockDuration"];
+	$("#dropdown").val(txt);
+
+	txt = localStorage["redirect"];
+	$("#workpage").val(txt);
+
    	// activate buttons
 	$('#saveDoms').click(checkDomInputs);
 	$('#export').click(exportData);
@@ -102,8 +109,8 @@ function verifyWorkpage () {
 	}
 
 	// inform user that we're working
-	$deets = $("<label id = 'deets'>Checking input validity. This may take a few seconds...</label>");
-	$('#redirect').append($deets);
+	deets = "Checking input validity. This may take a few seconds...";
+	document.getElementById("workUpdate").innerHTML = deets;
 
 	//ajax check
 	$.ajax({
@@ -124,11 +131,8 @@ function verifyWorkpage () {
 
 			localStorage["redirect"] = workpage;
 			console.log(workpage + " is valid. saved.");
-			$success = $("<p id = 'nice'>Redirect URL saved successfully</p>");
-			$("#deets").remove();
-			$("#redirect").append($success);
-			$("#nice").fadeOut(5000);
-
+			var success = "Redirect URL saved successfully";
+			document.getElementById("workUpdate").innerHTML = success;
 		},
 
 		// domain does not exist
@@ -155,15 +159,12 @@ function saveDuration() {
 		console.log("block duration is currently " + dur);
 		localStorage["blockDuration"] = dur;
 
-		$save = $("<p id = 'win'>new block duration set.</p>");
-		$("#dur").append($save);
-		$("#win").fadeOut(5000);
+		var save = "new block duration set.";
+		document.getElementById("durUpdate").innerHTML = save;
 	}
 	else {
-		$sorry = $("<p id = 'lose'>You may not change block duration during a block. Sorry.</p>");
-		$("#dur").append($sorry);
-		$("#lose").fadeOut(5000);
-
+		var sorry = "You may not change block duration during a block. Sorry.";
+		document.getElementById("durUpdate").innerHTML = sorry;
 	}
 }
 
@@ -173,8 +174,8 @@ function checkDomInputs() {
 	console.log("time to check and save");
 
 	// inform user that we're working
-	$deets = $("<label id = 'deets'>Checking input validity. This may take a few seconds...</label>");
-	$('#doms').append($deets);
+	var deets = "Checking input validity. This may take a few seconds...";
+	document.getElementById("domsUpdate").innerHTML = deets;
 
 	// parse the doms input value
 	var doms = $('#domains').val();
@@ -229,11 +230,8 @@ function makeDH(doms) {
 	}
 	localStorage["domHash"] = JSON.stringify(dH);
 	console.log("user's domHash saved");
-	$saved = $("<p id = 'woot'>New Domains saved<p/>");
-	$("#deets").remove();
-	$("#doms").append($saved);
-	$("#woot").fadeOut(5000);
-
+	var saved = "New Domains saved";
+	document.getElementById("domsUpdate").innerHTML = saved;
 }
 
 // checks that each domain name input exists. Calls Hash making code if 
@@ -262,7 +260,6 @@ function checkDom(doms, count, last) {
 		// domain does not exist
 		error: function() {
         	console.log(doms[count] + " failed!");
-        	$("#deets").remove();
         	alert("Domain Name input invalid!\n Culprit: " + doms[count]);
         	return;
 		}
