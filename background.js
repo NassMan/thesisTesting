@@ -61,7 +61,7 @@ localStorage["blockDuration"] = 1;
 // 5 minutes -> 5min
 // no target -> count
 // control -> control
-localStorage["keyVal"] = "control";
+localStorage["keyVal"] = "now";
 
 // disables multiple key inputs
 localStorage["keyBool"] = "false";
@@ -165,32 +165,6 @@ function checkBlock() {
 	else {
 		localStorage["blockCount"] = count;
 	}
-
-	
-	// removes block at 6 am.
-   /* var now = new Date();
-
-    var targetSetTime = localStorage["targetSetTime"];
-    if (targetSetTime !== undefined) {
-   		var qst = targetSetTime.split("_");
-   	 	var setDay = parseInt($.trim(qst[0]));
-    	var setHr = parseInt($.trim(qst[1]));
-    	var today = now.getDay();
-    	var nowHr = now.getHours();
-
-    	console.log('now is ' + nowHr + ' of ' + today + '.');
-    	console.log('set on ' + setHr + ' of ' + setDay + '.');
-   		console.log('day comparison evaluates to ' + (setDay !== today));
-   		console.log('hours compare to 6 evaluates to ' + (setHr < 6 && nowHr > 6));
-
-
-    	if (setDay !== today || (setHr < 6 && nowHr > 6)) {
-    		localStorage["blockVar"] = "false";
-    		localStorage["target"] = 0;
-    		console.log("you did great. the block is coming down");
-    	}
-    	else console.log("not yet sry");
-    }*/
 }
 
 // adds to time wasted and calls target checking code
@@ -291,9 +265,9 @@ function blockPrompt(ratio) {
 
 	if (c === true) {
 		var blockNum = localStorage["blockNum"];
-		var time = makeTimeStamp();
+		var time = new Date();
     	var log = "\n" + blockNum + ". " + percent + 
-    		"% of " + dur + " hours. day_time: " + time;
+    		"% of " + dur + " hours. " + time;
 	
 		// block either in 5 minutes or right now, depending on key
 		if (key === "5min") {
@@ -350,9 +324,9 @@ function userBlock() {
 
 	if (c === true) {
 		var blockNum = localStorage["blockNum"];
-		var time = makeTimeStamp();
+		var time = new Date();
 		var log = "\n" + blockNum + ". User Instigated. " + 
-			dur + " hours. day_time: " + time;
+			dur + " hours. " + time;
 
 		// block either in 5 minutes or right now
 		if (key === "5min") {
@@ -392,15 +366,6 @@ function createBlock(bLog) {
   	waiting = false;
 	localStorage["blockVar"] = "true";
 	chrome.tabs.reload();
-}
-
-function makeTimeStamp() {
-	// package and save time target was set
-    var date = new Date();
-    var day = date.getDay();
-    var hr = date.getHours();
-    var dateString = day + "_" + hr;
-    return dateString;
 }
 
 // count periodically

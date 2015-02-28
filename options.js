@@ -50,16 +50,12 @@ function clearTarget() {
 		localStorage["target"] = 0;
 		localStorage["timeWasted"] = 0;
 
-		// package and save time target was cleared
-    	var date = new Date();
-    	var day = date.getDay();
-    	var hr = date.getHours();
-    	var dateString = day + "_" + hr;
-
     	// make a target clear log with timestamp
+    	var date = new Date();
 		var tCache = localStorage["resetLog"];
-		var clrNum = localStorage["resetNum"];
-		tCache += clrNum + ". " + dateString;
+		var clrNum = JSON.parse(localStorage["resetNum"]);
+		clrNum++;
+		tCache += clrNum + ". " + date + "\n";
 		localStorage["resetLog"] = tCache;
 	}
 }
@@ -171,24 +167,30 @@ function saveDuration() {
 // button activation for domains to monitor setting
 // check for the validity of domain names and store them if valid
 function checkDomInputs() {
-	console.log("time to check and save");
+	var blocking = JSON.parse(localStorage["blockVar"]);
 
-	// inform user that we're working
-	var deets = "Checking input validity. This may take a few seconds...";
-	document.getElementById("domsUpdate").innerHTML = deets;
+	if (!blocking) {
 
-	// parse the doms input value
-	var doms = $('#domains').val();
-	doms = doms.split(/\s*,\s*/);
+		console.log("time to check and save");
 
-	for (var c in doms) {
-		doms[c] = $.trim(doms[c]);
+		// inform user that we're working
+		var deets = "Checking input validity. This may take a few seconds...";
+		document.getElementById("domsUpdate").innerHTML = deets;
+
+		// parse the doms input value
+		var doms = $('#domains').val();
+		doms = doms.split(/\s*,\s*/);
+
+		for (var c in doms) {
+			doms[c] = $.trim(doms[c]);
+		}
+
+		// check that domain inputs are valid
+		var last = doms.length - 1;
+		var count = 0;
+		checkDom(doms, count, last);
 	}
-
-	// check that domain inputs are valid
-	var last = doms.length - 1;
-	var count = 0;
-	checkDom(doms, count, last);
+	else alert("For Shame!");
 }
 
 // create a new domHash and transfer old values if applicable
@@ -196,29 +198,35 @@ function makeDH(doms) {
 
 	var dH = new Object();
 	var oldDH = JSON.parse(localStorage["domHash"]);
-
+	var otherTemp = JSON.parse(localStorage["otherDoms"]);
 	console.log(oldDH);
 	console.log("creating an updated domHash");
 
 	// transfer time wasted values if there are matching domains in the new set
-	// !! possible improvement: save in separate data package positive time 
-	// !! wasted values that are thrown out 
-	for (var i = 0; i < doms.length; i++) {
-		for (var j in oldDH) {
+	for (var j in oldDH) {
+		for (var i = 0; i < doms.length; i++) {
 			console.log("old dom is " + j + " and new is " + doms[i]);
 			if (j === doms[i]) {
 				console.log("match! Transferring value " + oldDH[j]);
 				dH[doms[i]] = oldDH[j];
 				break;
 			}
+
+			// add the untransferred value to an "other" cache
 			else {
+				if (i === doms.length - 1) {
+					otherTemp +=  oldDH[j];
+					console.log("the value " + oldDH[j] + " from dom " + j
+						+ " was added to 'other'");
+				}
 				console.log("writing value 0");
 				dH[doms[i]] = 0; 
 			}
 		}
 	}
 	console.log('user domHash initialized');
-
+	localStorage["otherDoms"] = otherTemp;
+	console.log("other total is " + otherTemp);
 
 	// show the values stored
 	for (var k in dH) {
@@ -229,6 +237,8 @@ function makeDH(doms) {
    		}
 	}
 	localStorage["domHash"] = JSON.stringify(dH);
+
+	// notify user of completion
 	console.log("user's domHash saved");
 	var saved = "New Domains saved";
 	document.getElementById("domsUpdate").innerHTML = saved;
@@ -236,31 +246,31 @@ function makeDH(doms) {
 
 // checks that each domain name input exists. Calls Hash making code if 
 // they all exist and alerts the user if an error is thrown
-function checkDom(doms, count, last) {
-	console.log("checking dom named '" + doms[count] 
-		+ "', index number " + count);
+function checkDom(doms, food, love) {
+	console.log("checking dom named '" + doms[food] 
+		+ "', index number " + food);
 
 	$.ajax({
 		//type: 'HEAD',
-		url: "http://" + doms[count],
+		url: "http://" + doms[food],
 
 		// domain exists
 		success: function() {
-			console.log(doms[count] + " is valid");
-			if (count === last) {
+			console.log(doms[food] + " is valid");
+			if (food === love) {
 				console.log("checked em all successfully!");
 				makeDH(doms);
 			}
 			else {
-				count++;
-				checkDom(doms, count, last);
+				food++;
+				checkDom(doms, food, love);
 			}
 		},
 
 		// domain does not exist
 		error: function() {
-        	console.log(doms[count] + " failed!");
-        	alert("Domain Name input invalid!\n Culprit: " + doms[count]);
+        	console.log(doms[food] + " failed!");
+        	alert("Domain Name input invalid!\n Culprit: " + doms[food]);
         	return;
 		}
 	});
@@ -280,11 +290,12 @@ function exportData() {
 	data += "\n# targets removed: ";
 	data += localStorage["resetNum"] + "\n";
 	
-	data += "target set Cache:\n";
+	data += "target removal Cache:\n";
 	data += localStorage["resetLog"] + "\n";
 
 	data += "\ndomHash:\n";
 	data += localStorage["domHash"] + "\n";
+	data += "other: " + localStorage["otherDoms"] + "\n";
 	
 	data += "\n# Blocks Prompted: ";
 	data += localStorage["promptNum"] + "\n";

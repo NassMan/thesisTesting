@@ -73,6 +73,7 @@ function makeChart() {
   if (blocking) {
     
     var dur = JSON.parse(localStorage["blockDuration"]);
+    var durMins = dur * 60;
     var blockSec = JSON.parse(localStorage["blockCount"]);
     var blockMins = Math.floor(blockSec / 60);
     var blockPct = Math.floor(((blockMins) / (dur * 60)) * 100);
@@ -82,11 +83,13 @@ function makeChart() {
           ['Block Usage',  blockMins, blockPct]
     ]);
     var title = 'Time Left for Block';
-
+    var text = 'Block Ends: ' + durMins;
+    var vals = makeTicks(durMins, text, blocking);
     options = {
-      width: 300,
+      width: 400,
       height: 300,
-      title: title
+      title: title,
+      vAxis: {ticks: vals}
     };
 
     var timeChart = new google.visualization.ColumnChart(
@@ -99,50 +102,70 @@ function makeChart() {
 
     var timeWasted = JSON.parse(localStorage["timeWasted"]);
     var target = JSON.parse(localStorage["target"]);
-
+    targetMins = parseFloat(60 * target);
 
     // display total wasted time since last reset
     var spentMins = Math.floor(timeWasted / 60);
     console.log('minutes spent is ' + spentMins);
+
     var data = google.visualization.arrayToDataTable([
-      ['Element', 'Play Time Usage', { role: 'style' }],
-      ['Minutes Spent', spentMins, 'color: blue']
+      ['XXZZXXZZXX', 'Play Time Usage'],
+      ['Minutes Spent', spentMins]
     ]);
     /*var data = new google.visualization.DataTable();
     data.addColumn('string', 'Time Spent'); 
     data.addColumn('number', 'minutes');
     data.addRows([['Minutes Spent', spentMins]]);*/
+    var options = {
+          width: 400,
+          height: 300,
+          title: title
+    }
 
     var title = 'Time spent on play sites';
 
 
     //display wasted time as %age of target
     if (target !== 0) {
-
-      // create % of target data table
-      var percent = Math.floor(((timeWasted / 60) / (60 * target)) * 100);
-      //var data2 = new google.visualization.DataTable();
-      data = google.visualization.arrayToDataTable([
-            ['Year', 'Minutes Spent', '% of Target'],
-            ['Play Time Usage',  spentMins, percent]
-      ]);
-      /*data.addColumn('string', 'Time Spent') 
-      data.addColumn('number', '%'),
-      data.addRows([['target Used (%)', percent]]);*/
       title = 'Time Spent and Target Usage';
+      var text = 'Target: ' + targetMins;
+      var vals = makeTicks(targetMins, text, blocking);
+      //var chm = r, FF0000, 0, targetMins, targetMins;
+      options = {
+        width: 400,
+        height: 300,
+        title: title,
+        vAxis: { ticks: vals}
+      };
     }
-
-    options = {
-      width: 300,
-      height: 300,
-      title: title
-    };
+  }
 
     var timeChart = new google.visualization.ColumnChart(
       document.getElementById('graph'));
 
     timeChart.draw(data, options);
+}
+
+function makeTicks(max, maxString, blockGraph) {
+  var ticks = [];
+  var interval = (max > 150) ? 30 : ((max > 60) ? 20 : 10);
+  var maxVal = max;
+  if (!blockGraph) {
+    maxVal = (2 * max) + 1;
+    interval *= 2;
   }
+  console.log(interval);
+  var count = 0;
+
+  for (var i = 0; i < maxVal; i = i + interval) {
+    if (i != max) {
+      ticks[count] = i;
+      count++; 
+    }
+  }
+  ticks[count] = {v: max, f: maxString};
+  console.log(ticks);
+  return ticks;
 }
 
 // set target variable and alter interface so target cannot be reset
@@ -159,24 +182,14 @@ function setTarget() {
     else targetNum = 1;
     localStorage["targetNum"] = JSON.stringify(targetNum);
     
-    // package and save time target was set
+    // log target setting in target cache
     var date = new Date();
-    var day = date.getDay();
-    var hr = date.getHours();
-    var dateString = day + "_" + hr;
-    
-    // log target size in target cache
     var qCache = localStorage["targetLog"];
-    qCache += "\n" + targetNum + ". " + target + " hrs. day_time: " + dateString;
+    qCache += "\n" + targetNum + ". " + target + " hrs. day_time: " + date;
     console.log(qCache);
     localStorage["targetLog"] = qCache;
     
-    console.log('total number of targets set is ' + targetNum);
-        
-
-
-    localStorage["targetSetTime"] = dateString;
-    console.log('target set at day_hour ' + dateString);
+    console.log('target set at ' + date);
     localStorage["target"] = JSON.stringify(target);
 
 		console.log("hiding");
