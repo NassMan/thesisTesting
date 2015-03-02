@@ -198,44 +198,39 @@ function makeDH(doms) {
 
 	var dH = new Object();
 	var oldDH = JSON.parse(localStorage["domHash"]);
-	var otherTemp = JSON.parse(localStorage["otherDoms"]);
+	var lostPlayTime = JSON.parse(localStorage["otherDoms"]);
 	console.log(oldDH);
 	console.log("creating an updated domHash");
 
+
 	// transfer time wasted values if there are matching domains in the new set
-	for (var j in oldDH) {
-		for (var i = 0; i < doms.length; i++) {
+	for (var i = 0; i < doms.length; i++) {
+		for (var j in oldDH) {
 			console.log("old dom is " + j + " and new is " + doms[i]);
 			if (j === doms[i]) {
 				console.log("match! Transferring value " + oldDH[j]);
 				dH[doms[i]] = oldDH[j];
 				break;
 			}
-
-			// add the untransferred value to an "other" cache
-			else {
-				if (i === doms.length - 1) {
-					otherTemp +=  oldDH[j];
-					console.log("the value " + oldDH[j] + " from dom " + j
-						+ " was added to 'other'");
-				}
-				console.log("writing value 0");
-				dH[doms[i]] = 0; 
-			}
+			else dH[doms[i]] = 0; 
 		}
 	}
-	console.log('user domHash initialized');
-	localStorage["otherDoms"] = otherTemp;
-	console.log("other total is " + otherTemp);
 
-	// show the values stored
-	for (var k in dH) {
-		console.log("the printing loop is happening");
-   		// use hasOwnProperty to filter out keys from the Object.prototype
-    	if (dH.hasOwnProperty(k)) {
-   	    	console.log('key is: ' + k + ', value is: ' + dH[k]);
-   		}
+	// save lost time spent in "other" cache
+	var oldSum = 0;
+	for (var k in oldDH) {
+		oldSum += oldDH[k];
+		console.log(oldDH[k]);
 	}
+	var newSum = 0;
+	for (var m in dH) newSum += dH[m];
+	lostPlayTime += (oldSum - newSum);
+	console.log("old total is " + oldSum + " and new total is " + newSum);
+	console.log("lost play time total is " + lostPlayTime);
+	localStorage["otherDoms"] = lostPlayTime;
+
+	// save new domHash
+	console.log(dH);
 	localStorage["domHash"] = JSON.stringify(dH);
 
 	// notify user of completion
