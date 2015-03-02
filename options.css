@@ -58,4 +58,13 @@ body {
 	float: bottom;
 	padding: 12px 24px 12px 12px;
 }
-
+#extrasButton {
+    position: fixed;
+    top: 510px;
+    left: 620px;
+}
+#updateNotes {
+    position: fixed;
+    top: 510px;
+    left: 200px;
+}

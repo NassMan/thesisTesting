@@ -34,8 +34,7 @@ $(document).ready(function() {
 	}
 
 	else {
-		$('#durButton').click(saveDuration);
-		$('#URLbutton').click(verifyWorkpage);
+		$('#extrasButton').click(verifyWorkpage);
 		$clear = $('<label><b>Reset Target and Time Wasted</b><br></label>')
 		$('#clearButton').before($clear);
 	}
@@ -92,6 +91,8 @@ function getDomain(url) {
 
 // checks for redirect URL validity and saves if valid. if not, alerts user
 function verifyWorkpage () {
+
+	saveDuration();
 	
 	// ensure workpage is URL
 	var workpage = $('#workpage').val();
@@ -143,19 +144,19 @@ function verifyWorkpage () {
 
 // button activation for duration setting
 function saveDuration() {
+	
 	var dur = parseFloat($('#dropdown').val());
-
 	if (isNaN(dur)) {
 		alert("invalid input! Please enter decimal or integer value");
 		return;
 	}
-	var prohibited = JSON.parse(localStorage["blockVar"]);
 
+	var prohibited = JSON.parse(localStorage["blockVar"]);
 	if (!prohibited) {
 		console.log("block duration is currently " + dur);
 		localStorage["blockDuration"] = dur;
 
-		var save = "new block duration set.";
+		var save = "Block duration set.";
 		document.getElementById("durUpdate").innerHTML = save;
 	}
 	else {
