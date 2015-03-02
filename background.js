@@ -22,6 +22,9 @@ for (var k in domHash) {
 // set initial storage values
 localStorage["domHash"] = JSON.stringify(domHash);
 
+// track time spent on deleted domains
+localStorage["otherDoms"] = 0;
+
 localStorage["timeWasted"] = 0;
 
 localStorage["target"] = 0;

@@ -54,7 +54,6 @@ var key = localStorage["keyVal"];
   else {
     $("#target").hide();
     $("#block").hide();
-    // $("#graph").hide();     maybe superfluous
   }
 
   $("#options").click(showOptions);
@@ -67,8 +66,10 @@ function showOptions() {
   });
 }
 
+// passes situation specific parameters to google charts.draw
 function makeChart() {
 
+  // if blocking, make a chart that shows how much block time left
   var blocking = JSON.parse(localStorage["blockVar"]);
   if (blocking) {
     
@@ -98,6 +99,7 @@ function makeChart() {
     timeChart.draw(data, options);    
   }
 
+  // display time wasted
   else {
 
     var timeWasted = JSON.parse(localStorage["timeWasted"]);
@@ -109,8 +111,8 @@ function makeChart() {
     console.log('minutes spent is ' + spentMins);
 
     var data = google.visualization.arrayToDataTable([
-      ['XXZZXXZZXX', 'Play Time Usage'],
-      ['Minutes Spent', spentMins]
+      ['XXZZXXZZXX', 'Minutes Spent'],
+      ['Play Time Usage', spentMins]
     ]);
     /*var data = new google.visualization.DataTable();
     data.addColumn('string', 'Time Spent'); 
@@ -125,12 +127,11 @@ function makeChart() {
     var title = 'Time spent on play sites';
 
 
-    //display wasted time as %age of target
+    //display wasted time relative to taret and 2 * target
     if (target !== 0) {
       title = 'Time Spent and Target Usage';
       var text = 'Target: ' + targetMins;
       var vals = makeTicks(targetMins, text, blocking);
-      //var chm = r, FF0000, 0, targetMins, targetMins;
       options = {
         width: 400,
         height: 300,
@@ -146,11 +147,13 @@ function makeChart() {
     timeChart.draw(data, options);
 }
 
-function makeTicks(max, maxString, blockGraph) {
+// create tick marks array that gives perspective on target or 
+// block duration, depending on the value of blocking boolean
+function makeTicks(max, maxString, blocking) {
   var ticks = [];
   var interval = (max > 150) ? 30 : ((max > 60) ? 20 : 10);
   var maxVal = max;
-  if (!blockGraph) {
+  if (!blocking) {
     maxVal = (2 * max) + 1;
     interval *= 2;
   }
@@ -198,6 +201,3 @@ function setTarget() {
     $("#reminder").append($set);
 	}
 }
-
-
-
