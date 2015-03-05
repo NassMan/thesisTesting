@@ -4,7 +4,7 @@ google.load("visualization", "1.0", {packages:["corechart"]});
 $(document).ready(function () {
 
 var key = localStorage["keyVal"];
-  if (key !== "control") {
+  if (key !== "Squall") {
 
     var timeWasted = JSON.parse(localStorage["timeWasted"]);
     if (timeWasted !== undefined) 
@@ -14,11 +14,11 @@ var key = localStorage["keyVal"];
     if (target !== undefined) {
 
       // offer target setting if no target set
-      if (target === 0 && key !== "count") {
+      if (target === 0 && key !== "Vaan") {
 
         // inject dropdown values
-        var option = '<option value = .1>6 minutes</option>';
-        for (var i = 1; i <= 16; i++) {
+        var option = '<option value = ' + .5 + '>' + 0.5 + ' Hours</option>';
+        for (var i = 2; i <= 16; i++) {
           var val = i * 0.5;
           option += '<option value = ' + val + '>' + val + '</option>';
         }
@@ -30,17 +30,20 @@ var key = localStorage["keyVal"];
       // else block any target change
       else {
         $("#target").hide();
-        if (key !== "count") {
-          var $set = $("<b>Target set for " + target + " hour(s)</b>");
+        if (key !== "Vaan") {
+          var set = "";
+          if (target < 2) {
+            $set = $("<b>Target set for " + target * 60 + " minutes</b>");
+          }
+          else $set = $("<b>Target set for " + target + " hours</b>");
           $("#reminder").append($set);
         }
       }
 
       var blocking = JSON.parse(localStorage["blockVar"]);
-      if (blocking || key === "count" || key === "control") {
+      if (blocking || key === "Vaan" || key === "Squall") {
         $("#block").hide();
         $("#target").hide();
-
       }
     }
 
@@ -77,11 +80,10 @@ function makeChart() {
     var durMins = dur * 60;
     var blockSec = JSON.parse(localStorage["blockCount"]);
     var blockMins = Math.floor(blockSec / 60);
-    var blockPct = Math.floor(((blockMins) / (dur * 60)) * 100);
 
     data = google.visualization.arrayToDataTable([
-          ['Year', 'Minutes Blocked', '% of Block Duration'],
-          ['Block Usage',  blockMins, blockPct]
+          ['Year', 'Minutes Blocked'],
+          ['Block Usage',  blockMins]
     ]);
     var title = 'Time Left for Block';
     var text = 'Block Ends: ' + durMins;
@@ -114,17 +116,14 @@ function makeChart() {
       ['XXZZXXZZXX', 'Minutes Spent'],
       ['Play Time Usage', spentMins]
     ]);
-    /*var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Time Spent'); 
-    data.addColumn('number', 'minutes');
-    data.addRows([['Minutes Spent', spentMins]]);*/
+
+    var title = 'Minutes spent on play sites';
     var options = {
           width: 400,
           height: 300,
           title: title
     }
 
-    var title = 'Time spent on play sites';
 
 
     //display wasted time relative to taret and 2 * target
@@ -194,10 +193,14 @@ function setTarget() {
     
     console.log('target set at ' + date);
     localStorage["target"] = JSON.stringify(target);
-
-		console.log("hiding");
     $("#target").hide();
-    var $set = $("<b>Target set for " + target + " hour(s)</b>");
+    
+    var set = "";
+    if (target < 2) {
+      $set = $("<b>Target set for " + target * 60 + " minutes</b>");
+    }
+    else $set = $("<b>Target set for " + target + " hours</b>");
+
     $("#reminder").append($set);
 	}
 }

@@ -60,11 +60,11 @@ localStorage["resetLog"] = "";	// stores target reset behavior
 localStorage["blockDuration"] = 1;
 
 // key to determine features
-// now -> now
-// 5 minutes -> 5min
-// no target -> count
-// control -> control
-localStorage["keyVal"] = "now";
+// Zidane -> now
+// Yuna -> 5min
+// Vaan -> count
+// Squall -> control
+localStorage["keyVal"] = "Squall";
 
 // disables multiple key inputs
 localStorage["keyBool"] = "false";
@@ -181,7 +181,7 @@ function countSum() {
 
 			var target = JSON.parse(localStorage["target"]);
 			var key = localStorage["keyVal"];
-			if (target !== 0 && !waiting && key !== "count" && key !== "control") {
+			if (target !== 0 && !waiting && key !== "Vaan" && key !== "Squall") {
 				checkWasteTarget(sum, target);
 			}	
 			else console.log("no target set");
@@ -245,13 +245,13 @@ function blockPrompt(ratio) {
 	var dur = localStorage["blockDuration"];
 	
 	// ask the user to block sites
-	if (key === "now") {
+	if (key === "Zidane") {
 		var c = 
 			confirm("You have spent " + percent + 
 				"% of your play time target.\n Do you want to block play sites now?\nBlock Duration set to "
 				+ dur + " hour(s)");
 	}
-	else if (key === "5min") {
+	else if (key === "Yuna") {
 		var c = 
 			confirm("You have spent " + percent + 
 				"% of your play time target.\n Do you want to block play sites in 5 minutes?\nBlock Duration set to "
@@ -273,13 +273,13 @@ function blockPrompt(ratio) {
     		"% of " + dur + " hours. " + time;
 	
 		// block either in 5 minutes or right now, depending on key
-		if (key === "5min") {
+		if (key === "Yuna") {
 			waiting = true;
-			var fiveMinMS = 600 * 1000; // sec * ms/sec		
+			var fiveMinMS = 300000; // sec * ms/sec		
 			setTimeout(createBlock, fiveMinMS, log);			
 									
 		}
-		else if (key === "now") {
+		else if (key === "Zidane") {
 			createBlock(log);
 		}										
 	}
@@ -309,11 +309,11 @@ function userBlock() {
   	// ask the user to block sites
   	var dur = localStorage["blockDuration"];
 
-  	if (key === "now") {
+  	if (key === "Zidane") {
   		var c = 
     		confirm("Are you sure you want to block now for " + dur + " hour(s)?");
     }
-    else if (key === "5min") {
+    else if (key === "Yuna") {
     	var c =
     		confirm("Are you sure you want to block in 5 minutes for " + dur + " hour(s)?");
     }
@@ -332,13 +332,13 @@ function userBlock() {
 			dur + " hours. " + time;
 
 		// block either in 5 minutes or right now
-		if (key === "5min") {
+		if (key === "Yuna") {
 			console.log("5min block just executed");
 			waiting = true;
-			var fiveMinMS = 600 * 1000; // sec * ms/sec		
+			var fiveMinMS = 300000; // sec * ms/sec		
 			setTimeout(createBlock, fiveMinMS, log);			
 		}
-		else if (key === "now") {
+		else if (key === "Zidane") {
 			console.log("now block just executed");
 			createBlock(log);
 		}
@@ -368,7 +368,22 @@ function createBlock(bLog) {
    	// instigate block
   	waiting = false;
 	localStorage["blockVar"] = "true";
-	chrome.tabs.reload();
+	//chrome.tabs.reload();
+
+	chrome.tabs.query({}, function(tabs) { 
+		var dH = JSON.parse(localStorage["domHash"]);
+		for (var i = 0; i < tabs.length; i++) {
+			for (var j in dH) {
+				var current = getDomain(tabs[i].url);
+				console.log("comparing this tab " + current + " with " + j);
+				if (current === j) {
+					console.log("match!!");
+					chrome.tabs.reload(tabs[i].id);
+				}
+			}
+		}
+	});
+
 }
 
 // count periodically

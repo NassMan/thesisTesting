@@ -27,8 +27,12 @@ $(document).ready(function() {
 
 	// change options page based on experimental group
 	var key = localStorage["keyVal"];
-	if (key === "control" || key === "count") {
+	if (key === "Squall" || key === "Vaan") {
+		if (key === "Squall") {
+			$("#clear").hide();
+		}
 		$("#extras").hide();
+		$("#extrasButton").hide();
 		$clear = $('<label><b>Reset Time Wasted</b><br></label>')
 		$('#clearButton').before($clear);
 	}
@@ -64,10 +68,10 @@ function activateKey() {
 
 	// check that it's one of the four valid keys
 	var keySub = $("#keyInput").val();
-	if (keySub !== "now" && keySub !== "5min" && 
-		keySub !== "count" && keySub !== "control") {
+	if (keySub !== "Zidane" && keySub !== "Yuna" && 
+		keySub !== "Vaan" && keySub !== "Squall") {
 
-		alert("invalid key!");
+		alert("invalid key! Please enter exactly the key you were given.");
 		$('#keyInput').val();
 		return;
 	}
@@ -78,9 +82,8 @@ function activateKey() {
 
 	// remove key input capability
 	localStorage["keyBool"] = "true";
-
-	// close the options page
-	window.close();
+	$("#key").remove();
+	chrome.tabs.reload();
 }
 
 // thanks to Dan Kang and his web timer
@@ -191,7 +194,7 @@ function checkDomInputs() {
 		var count = 0;
 		checkDom(doms, count, last);
 	}
-	else alert("For Shame!");
+	else alert("During a block?! For Shame!");
 }
 
 // create a new domHash and transfer old values if applicable
